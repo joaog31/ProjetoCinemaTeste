@@ -226,27 +226,6 @@ void deveRegistrarRecomendacoesNoHistorico() throws Exception {
 9. **equals/hashCode por ID** — Filme é único por ID
 10. **Javadoc** — métodos públicos e interfaces documentados
 
-## O Que Falta (Etapa 2 - 50%)
-
-- Implementação de `CatalogoMockRealista` com 30+ filmes hardcoded
-- Implementação real de `CatalogoFilmesAPI` conectando com TMDB/OMDB
-- Implementação real de `HistoricoUsuarioRepositorio` com banco de dados
-- Implementação real de `NotificadorPush` com Firebase
-- Implementação real de `GeradorAleatorio` com `java.util.Random`
-- Diagrama de classes e diagrama de sequência
-- Apresentação (pitch) do produto
-- Modo "Surpreenda-me" completo
-
-## Próximos Passos
-
-1. Implementar `CatalogoMockRealista` com dados realistas
-2. Adicionar logs estruturados em toda a aplicação
-3. Criar builder pattern para entidades complexas (Filme, PerfilCinefilo)
-4. Adicionar métricas e observabilidade
-5. Criar integração com API TMDB real
-6. Persistir dados em banco de dados
-7. Integrar com Firebase para notificações
-
 ## Contato
 
 Projeto CineSmart — Recomendador de Filmes por Perfil (Java 11, JUnit 5, Mockito)
