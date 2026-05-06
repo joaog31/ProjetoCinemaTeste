@@ -17,15 +17,19 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import org.mockito.Captor;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import br.com.cinesmart.modelo.ClassificacaoEtaria;
@@ -55,10 +59,8 @@ class RecomendadorServicoTest {
     @Mock private NotificadorPush notificador;
     @Mock private GeradorAleatorio gerador;
     @Captor private ArgumentCaptor<List<Recomendacao>> captorRecomendacoes;
-
-    private CalculadoraScore calculadora;
-    private FiltroFilmes filtro;
-    private RecomendadorServico servico;
+    @Spy private final CalculadoraScore calculadora = new CalculadoraScore();
+    @InjectMocks private RecomendadorServico servico;
     private Usuario usuario;
     private List<Filme> catalogoMock;
 
@@ -71,10 +73,6 @@ class RecomendadorServicoTest {
 
     @BeforeEach
     void setUp() {
-        calculadora = new CalculadoraScore();
-        filtro = new FiltroFilmes();
-        servico = new RecomendadorServico(catalogo, historico, notificador, gerador, calculadora, filtro);
-
         // Criar usuário de teste (Maria do documento)
         PerfilCinefilo perfil = new PerfilCinefilo(90, 150, ClassificacaoEtaria.DEZESSEIS,
                 Set.of(Idioma.PORTUGUES, Idioma.INGLES));
@@ -259,15 +257,18 @@ class RecomendadorServicoTest {
     void modoAleatorioDevolveFilmeValidoDe() throws Exception {
         // Arrange
         when(catalogo.buscarTodos()).thenReturn(catalogoMock);
-        when(gerador.sortearInteiro(0, 5)).thenReturn(1); // índice 1 do conjunto filtrado
+        when(gerador.sortearInteiro(anyInt(), anyInt())).thenReturn(1, 0);
 
         // Act
-        List<Recomendacao> resultado = servico.recomendarAleatorio(usuario);
+        List<Recomendacao> primeiro = servico.recomendarAleatorio(usuario);
+        List<Recomendacao> segundo = servico.recomendarAleatorio(usuario);
 
         // Assert
-        assertEquals(1, resultado.size());
-        assertEquals("F02", resultado.get(0).getFilme().getId());
-        verify(gerador, times(1)).sortearInteiro(0, 5);
+        assertEquals(1, primeiro.size());
+        assertEquals(1, segundo.size());
+        assertEquals("F02", primeiro.get(0).getFilme().getId());
+        assertEquals("F01", segundo.get(0).getFilme().getId());
+        verify(gerador, times(2)).sortearInteiro(anyInt(), anyInt());
     }
 
     @Test
@@ -293,6 +294,8 @@ class RecomendadorServicoTest {
         List<Recomendacao> resultado = servico.recomendar(usuario, 5);
 
         // Assert
+        verify(catalogo, atLeastOnce()).buscarTodos();
+        verify(calculadora, atLeastOnce()).calcular(any(Filme.class), any(PerfilCinefilo.class));
         for (Recomendacao rec : resultado) {
             assertTrue(rec.getScore() >= 0.0 && rec.getScore() <= 100.0);
         }
@@ -332,7 +335,7 @@ class RecomendadorServicoTest {
     void deveDesempatarPorPopularidadeQuandoScoreEmpata() throws Exception {
         // Arrange
         CalculadoraScore calculadoraEmpate = new CalculadoraScoreFixa();
-        RecomendadorServico servicoLocal = new RecomendadorServico(catalogo, historico, notificador, gerador, calculadoraEmpate, filtro);
+        RecomendadorServico servicoLocal = new RecomendadorServico(catalogo, historico, notificador, gerador, calculadoraEmpate, new FiltroFilmes());
 
         List<Filme> catalogoEmpatePopularidade = List.of(
                 new Filme("P01", "Filme A", 2024, 120,
