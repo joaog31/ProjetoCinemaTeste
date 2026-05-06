@@ -19,6 +19,7 @@ import org.mockito.ArgumentCaptor;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
@@ -53,12 +54,20 @@ class RecomendadorServicoTest {
     @Mock private HistoricoUsuarioRepositorio historico;
     @Mock private NotificadorPush notificador;
     @Mock private GeradorAleatorio gerador;
+    @Captor private ArgumentCaptor<List<Recomendacao>> captorRecomendacoes;
 
     private CalculadoraScore calculadora;
     private FiltroFilmes filtro;
     private RecomendadorServico servico;
     private Usuario usuario;
     private List<Filme> catalogoMock;
+
+    private static class CalculadoraScoreFixa extends CalculadoraScore {
+        @Override
+        public double calcular(Filme filme, PerfilCinefilo perfil) {
+            return 85.0;
+        }
+    }
 
     @BeforeEach
     void setUp() {
@@ -127,7 +136,7 @@ class RecomendadorServicoTest {
         List<Recomendacao> resultado = servico.recomendar(usuario, 2);
 
         // Assert
-        assertTrue(resultado.size() <= 2);
+        assertEquals(2, resultado.size());
     }
 
     @Test
@@ -216,15 +225,13 @@ class RecomendadorServicoTest {
     void deveInspecionarRecomendacoesRegistradas() throws Exception {
         // Arrange
         when(catalogo.buscarTodos()).thenReturn(catalogoMock);
-        @SuppressWarnings("unchecked")
-        ArgumentCaptor<List<Recomendacao>> captor = ArgumentCaptor.forClass((Class) List.class);
 
         // Act
         servico.recomendar(usuario, 3);
 
         // Assert
-        verify(historico).registrarRecomendacao(eq(usuario), captor.capture());
-        List<Recomendacao> registradas = captor.getValue();
+        verify(historico).registrarRecomendacao(eq(usuario), captorRecomendacoes.capture());
+        List<Recomendacao> registradas = captorRecomendacoes.getValue();
         
         assertAll(
             () -> assertFalse(registradas.isEmpty()),
@@ -260,6 +267,7 @@ class RecomendadorServicoTest {
         // Assert
         assertEquals(1, resultado.size());
         assertEquals("F02", resultado.get(0).getFilme().getId());
+        verify(gerador, times(1)).sortearInteiro(0, 5);
     }
 
     @Test
@@ -317,5 +325,30 @@ class RecomendadorServicoTest {
         assertEquals("E02", resultado.get(0).getFilme().getId());
         assertEquals("E01", resultado.get(1).getFilme().getId());
         verify(gerador, times(1)).sortearInteiro(0, 2);
+    }
+
+    @Test
+    @DisplayName("empates de score devem ser desempatados por popularidade")
+    void deveDesempatarPorPopularidadeQuandoScoreEmpata() throws Exception {
+        // Arrange
+        CalculadoraScore calculadoraEmpate = new CalculadoraScoreFixa();
+        RecomendadorServico servicoLocal = new RecomendadorServico(catalogo, historico, notificador, gerador, calculadoraEmpate, filtro);
+
+        List<Filme> catalogoEmpatePopularidade = List.of(
+                new Filme("P01", "Filme A", 2024, 120,
+                        Set.of(Genero.DRAMA), ClassificacaoEtaria.DOZE, Idioma.INGLES, 70),
+                new Filme("P02", "Filme B", 2024, 120,
+                        Set.of(Genero.DRAMA), ClassificacaoEtaria.DOZE, Idioma.INGLES, 90)
+        );
+
+        when(catalogo.buscarTodos()).thenReturn(catalogoEmpatePopularidade);
+
+        // Act
+        List<Recomendacao> resultado = servicoLocal.recomendar(usuario, 2);
+
+        // Assert
+        assertEquals(2, resultado.size());
+        assertEquals("P02", resultado.get(0).getFilme().getId());
+        assertEquals("P01", resultado.get(1).getFilme().getId());
     }
 }
