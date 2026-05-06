@@ -20,7 +20,7 @@ CineSmart recebe o perfil de um usuário (gêneros preferidos, duração ideal, 
 5. Retorna top N recomendações + registra histórico + envia notificação
 ```
 
-## Estrutura do Projeto (50% - Etapa 1)
+## Estrutura do Projeto 
 
 ```
 CineSmart/
