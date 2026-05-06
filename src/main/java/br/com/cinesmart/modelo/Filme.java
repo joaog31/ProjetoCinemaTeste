@@ -59,7 +59,7 @@ public final class Filme {
     }
 
     public Set<Genero> getGeneros() {
-        return new HashSet<>(generos);
+        return generos;
     }
 
     public ClassificacaoEtaria getClassificacao() {

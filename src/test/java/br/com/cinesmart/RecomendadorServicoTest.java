@@ -112,7 +112,7 @@ class RecomendadorServicoTest {
         List<Recomendacao> resultado = servico.recomendar(usuario, 5);
 
         // Assert
-        assertEquals(4, resultado.size()); // F04 foi removido (já assistido? não, mas... vamos aceitar)
+        assertEquals(5, resultado.size());
         assertTrue(resultado.get(0).getScore() >= resultado.get(1).getScore());
         assertTrue(resultado.get(1).getScore() >= resultado.get(2).getScore());
     }
@@ -252,13 +252,14 @@ class RecomendadorServicoTest {
     void modoAleatorioDevolveFilmeValidoDe() throws Exception {
         // Arrange
         when(catalogo.buscarTodos()).thenReturn(catalogoMock);
-        when(gerador.sortearInteiro(0, 4)).thenReturn(1); // índice 1 do conjunto filtrado
+        when(gerador.sortearInteiro(0, 5)).thenReturn(1); // índice 1 do conjunto filtrado
 
         // Act
         List<Recomendacao> resultado = servico.recomendarAleatorio(usuario);
 
         // Assert
-        assertTrue(resultado.size() <= 1); // pode não ter filme válido ou ter 1
+        assertEquals(1, resultado.size());
+        assertEquals("F02", resultado.get(0).getFilme().getId());
     }
 
     @Test

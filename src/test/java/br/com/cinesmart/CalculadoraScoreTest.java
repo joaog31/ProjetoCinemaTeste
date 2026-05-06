@@ -1,20 +1,21 @@
 package br.com.cinesmart;
 
-import br.com.cinesmart.modelo.ClassificacaoEtaria;
-import br.com.cinesmart.modelo.Filme;
-import br.com.cinesmart.modelo.Genero;
-import br.com.cinesmart.modelo.Idioma;
-import br.com.cinesmart.modelo.PerfilCinefilo;
-import br.com.cinesmart.servico.CalculadoraScore;
+import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.*;
+import br.com.cinesmart.modelo.ClassificacaoEtaria;
+import br.com.cinesmart.modelo.Filme;
+import br.com.cinesmart.modelo.Genero;
+import br.com.cinesmart.modelo.Idioma;
+import br.com.cinesmart.modelo.PerfilCinefilo;
+import br.com.cinesmart.servico.CalculadoraScore;
 
 /**
  * Testes unitários para a classe CalculadoraScore.
@@ -54,8 +55,9 @@ class CalculadoraScoreTest {
         // Arrange
         perfil.setPeso(Genero.FICCAO_CIENTIFICA, 0.9);
         perfil.setPeso(Genero.TERROR, 0.0);
-        Filme filme = new Filme("F002", "O Iluminado", 1980, 146, Set.of(Genero.TERROR),
-                ClassificacaoEtaria.DEZOITO, Idioma.INGLES, 88);
+        // Cenário de baixa aderência global: gênero sem afinidade, duração fora da faixa e baixa popularidade.
+        Filme filme = new Filme("F002", "O Iluminado", 1980, 30, Set.of(Genero.TERROR),
+            ClassificacaoEtaria.DEZOITO, Idioma.INGLES, 5);
 
         // Act
         double score = calculadora.calcular(filme, perfil);
@@ -140,6 +142,21 @@ class CalculadoraScoreTest {
     }
 
     @Test
+    @DisplayName("deve limitar score quando não há aderência de gênero mesmo com duração e popularidade altas")
+    void deveLimitarScoreSemAderenciaDeGenero() {
+        // Arrange
+        perfil.setPeso(Genero.ACAO, 0.0);
+        Filme filme = new Filme("F006c", "Blockbuster sem Aderencia", 2024, 120,
+                Set.of(Genero.ACAO), ClassificacaoEtaria.DOZE, Idioma.INGLES, 95);
+
+        // Act
+        double score = calculadora.calcular(filme, perfil);
+
+        // Assert
+        assertTrue(score <= 30.0);
+    }
+
+    @Test
     @DisplayName("deve considerar bônus de afinidade baseado em notas históricas")
     void deveConsiderarBonusDeAfinidade() {
         // Arrange
@@ -160,14 +177,15 @@ class CalculadoraScoreTest {
     @DisplayName("filme sem gêneros deve ter score baixo")
     void filmeSemGeneroDeveTerScoreBaixo() {
         // Arrange
-        Filme filmeSemGenero = new Filme("F008", "Filme Vazio", 2020, 120,
-                Set.of(), ClassificacaoEtaria.DOZE, Idioma.INGLES, 50);
+        // Sem gêneros e sem fatores compensatórios para manter o score muito baixo.
+        Filme filmeSemGenero = new Filme("F008", "Filme Vazio", 2020, 20,
+            Set.of(), ClassificacaoEtaria.DOZE, Idioma.INGLES, 0);
 
         // Act
         double score = calculadora.calcular(filmeSemGenero, perfil);
 
         // Assert
-        assertTrue(score < 30.0); // score deve ser muito baixo
+        assertTrue(score < 20.0); // score deve ser muito baixo
     }
 
     @Test

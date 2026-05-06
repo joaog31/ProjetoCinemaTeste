@@ -26,6 +26,8 @@ public class CalculadoraScore {
     private static final double SCORE_MAXIMO = 100.0;
     private static final double SCORE_MINIMO = 0.0;
     private static final int TOLERANCIA_DURACAO_MINUTOS = 30;
+    private static final double LIMIAR_BAIXA_ADERENCIA_GENERO = 20.0;
+    private static final double TETO_SCORE_BAIXA_ADERENCIA_GENERO = 30.0;
 
     /**
      * Calcula o score de compatibilidade entre um filme e o perfil do usuário.
@@ -44,6 +46,11 @@ public class CalculadoraScore {
             (scoreDuracao * PESO_DURACAO) +
             (scorePopularidade * PESO_POPULARIDADE) +
             (scoreAfinidade * PESO_AFINIDADE);
+
+        // Regra de negócio: sem aderência de gênero, o score final deve permanecer baixo.
+        if (scoreGenero < LIMIAR_BAIXA_ADERENCIA_GENERO) {
+            scoreTotal = Math.min(scoreTotal, TETO_SCORE_BAIXA_ADERENCIA_GENERO);
+        }
 
         return Math.max(SCORE_MINIMO, Math.min(SCORE_MAXIMO, scoreTotal));
     }
