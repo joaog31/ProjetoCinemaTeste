@@ -1,15 +1,17 @@
 package br.com.cinesmart.servico;
 
-import br.com.cinesmart.modelo.Filme;
-import br.com.cinesmart.modelo.Recomendacao;
-import br.com.cinesmart.modelo.Usuario;
-import br.com.cinesmart.utilitario.GeradorAleatorio;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import br.com.cinesmart.modelo.Filme;
+import br.com.cinesmart.modelo.Recomendacao;
+import br.com.cinesmart.modelo.Usuario;
+import br.com.cinesmart.utilitario.GeradorAleatorio;
 
 /**
  * Orquestrador principal do sistema de recomendações.
@@ -84,14 +86,14 @@ public class RecomendadorServico {
             }
 
             // Passo 4: Ranquear (ordenar por score desc, depois popularidade desc, depois aleatório)
-            recomendacoes.sort(Comparator.comparingDouble(Recomendacao::getScore).reversed()
-                    .thenComparingInt(r -> r.getFilme().getPopularidade()).reversed());
+                recomendacoes.sort(Comparator.comparingDouble(Recomendacao::getScore).reversed()
+                    .thenComparing(Comparator.comparingInt((Recomendacao r) -> r.getFilme().getPopularidade()).reversed()));
 
             // Passo 5: Aplicar desempate aleatório se necessário
             recomendacoes = aplicarDesempateAleatorio(recomendacoes);
 
             // Passo 6: Retornar apenas topN
-            List<Recomendacao> resultado = recomendacoes.subList(0, Math.min(topN, recomendacoes.size()));
+                List<Recomendacao> resultado = new ArrayList<>(recomendacoes.subList(0, Math.min(topN, recomendacoes.size())));
 
             // Passo 7: Registrar no histórico
             historico.registrarRecomendacao(usuario, new ArrayList<>(resultado));
@@ -186,8 +188,38 @@ public class RecomendadorServico {
      * @return lista com desempate aplicado
      */
     private List<Recomendacao> aplicarDesempateAleatorio(List<Recomendacao> recomendacoes) {
-        // Para simplificar em 50%, apenas retornar na ordem atual
-        // Em uma versão completa, agruparia por score e sortearia dentro de cada grupo
-        return recomendacoes;
+        if (recomendacoes.size() < 2) {
+            return new ArrayList<>(recomendacoes);
+        }
+
+        List<Recomendacao> resultado = new ArrayList<>(recomendacoes);
+        int inicioGrupo = 0;
+
+        while (inicioGrupo < resultado.size()) {
+            int fimGrupo = inicioGrupo + 1;
+            while (fimGrupo < resultado.size() && mesmoEmpate(resultado.get(inicioGrupo), resultado.get(fimGrupo))) {
+                fimGrupo++;
+            }
+
+            if (fimGrupo - inicioGrupo > 1) {
+                embaralharGrupo(resultado, inicioGrupo, fimGrupo);
+            }
+
+            inicioGrupo = fimGrupo;
+        }
+
+        return resultado;
+    }
+
+    private boolean mesmoEmpate(Recomendacao primeira, Recomendacao segunda) {
+        return Double.compare(primeira.getScore(), segunda.getScore()) == 0
+                && primeira.getFilme().getPopularidade() == segunda.getFilme().getPopularidade();
+    }
+
+    private void embaralharGrupo(List<Recomendacao> recomendacoes, int inicio, int fimExclusivo) {
+        for (int indice = fimExclusivo - 1; indice > inicio; indice--) {
+            int indiceSorteado = gerador.sortearInteiro(inicio, indice + 1);
+            Collections.swap(recomendacoes, indice, indiceSorteado);
+        }
     }
 }

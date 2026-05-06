@@ -215,7 +215,7 @@ void deveRegistrarRecomendacoesNoHistorico() throws Exception {
 
 ## Bugs Encontrados Nos Testes
 
-| ID | Bug encontrado | Teste que revelou | Correção indicada |
+| ID | Bug encontrado | Teste que revelou | Correção Feita |
 |----|----------------|-------------------|-------------------|
 | B01 | `Filme.getGeneros()` não retornava uma coleção realmente imutável. O teste esperava `UnsupportedOperationException`, mas a alteração da coleção retornada não falhava. | [FilmeTest.deveRetornarCopiaDeGeneros](src/test/java/br/com/cinesmart/FilmeTest.java#L73) | Fazer o getter devolver uma visão imutável, usando `Collections.unmodifiableSet(...)` sobre uma cópia defensiva. |
 | B02 | A ordenação das recomendações em `RecomendadorServico` invertia a lógica final por causa do `reversed()` aplicado ao comparador completo. | [RecomendadorServicoTest.deveInspecionarRecomendacoesRegistradas](src/test/java/br/com/cinesmart/RecomendadorServicoTest.java#L209) | Ajustar o comparador para ordenar por score decrescente e, em seguida, por popularidade decrescente, sem inverter a ordenação inteira no final. |
@@ -234,7 +234,3 @@ void deveRegistrarRecomendacoesNoHistorico() throws Exception {
 8. **Validações rigorosas** — PerfilCinefilo lança exceção para entrada inválida
 9. **equals/hashCode por ID** — Filme é único por ID
 10. **Javadoc** — métodos públicos e interfaces documentados
-
-## Contato
-
-Projeto CineSmart — Recomendador de Filmes por Perfil (Java 11, JUnit 5, Mockito)
