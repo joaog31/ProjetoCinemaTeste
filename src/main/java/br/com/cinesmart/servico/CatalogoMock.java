@@ -9,10 +9,6 @@ import br.com.cinesmart.modelo.Filme;
 import br.com.cinesmart.modelo.Genero;
 import br.com.cinesmart.modelo.Idioma;
 
-/**
- * Implementação em memória de {@link CatalogoFilmesAPI} para uso local e testes.
- * Mantém um catálogo fixo com pelo menos 30 filmes para atender o cenário de exemplo.
- */
 public final class CatalogoMock implements CatalogoFilmesAPI {
     private static final List<Filme> FILMES = List.of(
             new Filme("F001", "Duna: Parte Dois", 2024, 166,

@@ -1,8 +1,5 @@
 package br.com.cinesmart.modelo;
 
-/**
- * Enumeração de idiomas de filmes suportados pelo CineSmart.
- */
 public enum Idioma {
     PORTUGUES("Português"),
     INGLES("Inglês"),

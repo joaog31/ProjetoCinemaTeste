@@ -1,8 +1,5 @@
 package br.com.cinesmart.modelo;
 
-/**
- * Enumeração de gêneros de filmes disponíveis no CineSmart.
- */
 public enum Genero {
     ACAO("Ação"),
     COMEDIA("Comédia"),

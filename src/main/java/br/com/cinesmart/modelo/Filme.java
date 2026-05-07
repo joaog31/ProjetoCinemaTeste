@@ -5,10 +5,6 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-/**
- * Representa um filme no catálogo do CineSmart.
- * Imutável: todos os valores são definidos no construtor e não podem ser alterados.
- */
 public final class Filme {
     private final String id;
     private final String titulo;
@@ -19,17 +15,6 @@ public final class Filme {
     private final Idioma idioma;
     private final int popularidade;
 
-    /**
-     * Construtor para criar um filme.
-     * @param id identificador único do filme
-     * @param titulo nome do filme
-     * @param ano ano de lançamento
-     * @param duracao duração em minutos
-     * @param generos conjunto de gêneros
-     * @param classificacao classificação etária
-     * @param idioma idioma original do filme
-     * @param popularidade índice de popularidade (0-100)
-     */
     public Filme(String id, String titulo, int ano, int duracao, Set<Genero> generos,
                  ClassificacaoEtaria classificacao, Idioma idioma, int popularidade) {
         this.id = Objects.requireNonNull(id, "ID do filme não pode ser null");
@@ -74,11 +59,6 @@ public final class Filme {
         return popularidade;
     }
 
-    /**
-     * Verifica se o filme contém um determinado gênero.
-     * @param genero a buscar
-     * @return true se o filme pertence a este gênero
-     */
     public boolean temGenero(Genero genero) {
         return generos.contains(genero);
     }

@@ -2,9 +2,6 @@ package br.com.cinesmart.modelo;
 
 import java.util.Objects;
 
-/**
- * Representa um usuário do sistema CineSmart.
- */
 public final class Usuario {
     private final String id;
     private final String nome;
@@ -12,14 +9,6 @@ public final class Usuario {
     private final PerfilCinefilo perfil;
     private final boolean notificacaoHabilitada;
 
-    /**
-     * Construtor para criar um usuário.
-     * @param id identificador único do usuário
-     * @param nome nome do usuário
-     * @param idade idade em anos
-     * @param perfil perfil de preferências
-     * @param notificacaoHabilitada se push notifications estão habilitadas
-     */
     public Usuario(String id, String nome, int idade, PerfilCinefilo perfil, boolean notificacaoHabilitada) {
         this.id = Objects.requireNonNull(id);
         this.nome = Objects.requireNonNull(nome);
@@ -28,13 +17,6 @@ public final class Usuario {
         this.notificacaoHabilitada = notificacaoHabilitada;
     }
 
-    /**
-     * Construtor alternativo com notificação desabilitada por padrão.
-     * @param id identificador único do usuário
-     * @param nome nome do usuário
-     * @param idade idade em anos
-     * @param perfil perfil de preferências
-     */
     public Usuario(String id, String nome, int idade, PerfilCinefilo perfil) {
         this(id, nome, idade, perfil, false);
     }

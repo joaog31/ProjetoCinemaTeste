@@ -1,8 +1,5 @@
 package br.com.cinesmart.modelo;
 
-/**
- * Enumeração de classificações etárias para filmes no Brasil.
- */
 public enum ClassificacaoEtaria {
     LIVRE(0, "Livre"),
     DEZ(10, "10 anos"),
@@ -27,11 +24,6 @@ public enum ClassificacaoEtaria {
         return descricao;
     }
 
-    /**
-     * Verifica se uma classificação é maior ou igual à outra.
-     * @param outra classificação a comparar
-     * @return true se esta classificação é >= outra
-     */
     public boolean ehMaiorOuIgual(ClassificacaoEtaria outra) {
         return this.idade >= outra.idade;
     }
