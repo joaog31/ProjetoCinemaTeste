@@ -193,10 +193,8 @@ class CalculadoraScoreTest {
     void deveSerDeterministico() {
         // Arrange
         perfil.setPeso(Genero.ACAO, 0.7);
-        Filme filme = new Filme("F009", "Filme Action", 2020, 110,
-                Set.of(Genero.ACAO), ClassificacaoEtaria.DOZE, Idioma.INGLES, 80);
-
-        // Act
+        Filme filme = new Filme("F009", "Filme Deterministico", 2020, 120,
+            Set.of(Genero.ACAO), ClassificacaoEtaria.DOZE, Idioma.INGLES, 80);
         double score1 = calculadora.calcular(filme, perfil);
         double score2 = calculadora.calcular(filme, perfil);
         double score3 = calculadora.calcular(filme, perfil);

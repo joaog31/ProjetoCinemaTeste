@@ -1,14 +1,20 @@
 package br.com.cinesmart;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
 import br.com.cinesmart.modelo.ClassificacaoEtaria;
 import br.com.cinesmart.modelo.Filme;
 import br.com.cinesmart.modelo.Genero;
 import br.com.cinesmart.modelo.Idioma;
-import java.util.HashSet;
-import java.util.Set;
-import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 
 /**
  * Testes unitários para a classe Filme.
