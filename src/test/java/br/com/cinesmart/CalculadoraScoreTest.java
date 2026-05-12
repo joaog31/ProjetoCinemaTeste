@@ -17,9 +17,7 @@ import br.com.cinesmart.modelo.Idioma;
 import br.com.cinesmart.modelo.PerfilCinefilo;
 import br.com.cinesmart.servico.CalculadoraScore;
 
-/**
- * Testes unitários para a classe CalculadoraScore.
- */
+
 @DisplayName("Teste: CalculadoraScore")
 class CalculadoraScoreTest {
 
@@ -36,68 +34,68 @@ class CalculadoraScoreTest {
     @Test
     @DisplayName("deve calcular score máximo para filme com todos os gêneros amados")
     void deveCalcularScoreMaximoParaFilmeComTodosGenerosAmados() {
-        // Arrange
+        
         perfil.setPeso(Genero.FICCAO_CIENTIFICA, 1.0);
         Filme filme = new Filme("F001", "Duna", 2021, 120, Set.of(Genero.FICCAO_CIENTIFICA),
                 ClassificacaoEtaria.QUATORZE, Idioma.INGLES, 92);
 
-        // Act
+        
         double score = calculadora.calcular(filme, perfil);
 
-        // Assert
-        assertTrue(score > 80.0); // deve ter score alto
-        assertTrue(score <= 100.0); // mas não pode exceder 100
+        
+        assertTrue(score > 80.0); 
+        assertTrue(score <= 100.0); 
     }
 
     @Test
     @DisplayName("deve retornar score baixo para filme com gênero não preferido")
     void deveRetornarScoreBaixoParaGeneroNaoPreferido() {
-        // Arrange
+        
         perfil.setPeso(Genero.FICCAO_CIENTIFICA, 0.9);
         perfil.setPeso(Genero.TERROR, 0.0);
-        // Cenário de baixa aderência global: gênero sem afinidade, duração fora da faixa e baixa popularidade.
+        
         Filme filme = new Filme("F002", "O Iluminado", 1980, 30, Set.of(Genero.TERROR),
             ClassificacaoEtaria.DEZOITO, Idioma.INGLES, 5);
 
-        // Act
+        
         double score = calculadora.calcular(filme, perfil);
 
-        // Assert
-        assertTrue(score < 20.0); // score deve ser muito baixo
+        
+        assertTrue(score < 20.0); 
     }
 
     @Test
     @DisplayName("deve retornar score máximo para duração dentro da faixa preferida")
     void deveRetornarScoreMaximoParaDuracaoDentroFaixa() {
-        // Arrange
+        
         perfil.setPeso(Genero.DRAMA, 0.8);
         Filme filme = new Filme("F003", "A Origem", 2010, 120, Set.of(Genero.DRAMA),
                 ClassificacaoEtaria.DOZE, Idioma.INGLES, 85);
 
-        // Act
+        
         double score = calculadora.calcular(filme, perfil);
 
-        // Assert
-        assertTrue(score >= 60.0); // score razoável
+        
+        assertTrue(score >= 60.0); 
         assertTrue(score <= 100.0);
     }
 
     @Test
     @DisplayName("deve reduzir score para duração acima da máxima preferida")
     void deveReduzirScoreParaDuracaoAcima() {
-        // Arrange
+        
         perfil.setPeso(Genero.DRAMA, 0.8);
         Filme filmeNormal = new Filme("F004a", "Filme Normal", 2020, 130,
                 Set.of(Genero.DRAMA), ClassificacaoEtaria.DOZE, Idioma.INGLES, 80);
         Filme filmeGrande = new Filme("F004b", "Filme Grande", 2020, 200,
                 Set.of(Genero.DRAMA), ClassificacaoEtaria.DOZE, Idioma.INGLES, 80);
 
-        // Act
+        
         double scoreNormal = calculadora.calcular(filmeNormal, perfil);
         double scoreGrande = calculadora.calcular(filmeGrande, perfil);
 
-        // Assert
-        assertTrue(scoreNormal > scoreGrande); // filme normal deve ter score maior
+        
+        assertTrue(scoreNormal > scoreGrande); 
     }
 
     @ParameterizedTest
@@ -108,7 +106,7 @@ class CalculadoraScoreTest {
         "0.5, 0.5, 0.5"
     })
     void scoreDeveEstadoEntre0E100(double p1, double p2, double p3) {
-        // Arrange
+        
         perfil.setPeso(Genero.ACAO, p1);
         perfil.setPeso(Genero.COMEDIA, p2);
         perfil.setPeso(Genero.DRAMA, p3);
@@ -116,82 +114,82 @@ class CalculadoraScoreTest {
                 Set.of(Genero.ACAO, Genero.COMEDIA, Genero.DRAMA),
                 ClassificacaoEtaria.DOZE, Idioma.INGLES, 50);
 
-        // Act
+        
         double score = calculadora.calcular(filme, perfil);
 
-        // Assert
+        
         assertTrue(score >= 0.0 && score <= 100.0);
     }
 
     @Test
     @DisplayName("deve considerar popularidade na fórmula de score")
     void deveConsiderarPopularidadeNaFormula() {
-        // Arrange
+        
         perfil.setPeso(Genero.DRAMA, 0.5);
         Filme filmeMenosPopular = new Filme("F006a", "Filme Menos Popular", 2020, 120,
                 Set.of(Genero.DRAMA), ClassificacaoEtaria.DOZE, Idioma.INGLES, 30);
         Filme filmeMaisPopular = new Filme("F006b", "Filme Mais Popular", 2020, 120,
                 Set.of(Genero.DRAMA), ClassificacaoEtaria.DOZE, Idioma.INGLES, 90);
 
-        // Act
+        
         double scoreMenos = calculadora.calcular(filmeMenosPopular, perfil);
         double scoreMais = calculadora.calcular(filmeMaisPopular, perfil);
 
-        // Assert
-        assertTrue(scoreMais > scoreMenos); // filme mais popular deve ter score maior
+        
+        assertTrue(scoreMais > scoreMenos); 
     }
 
     @Test
     @DisplayName("deve limitar score quando não há aderência de gênero mesmo com duração e popularidade altas")
     void deveLimitarScoreSemAderenciaDeGenero() {
-        // Arrange
+        
         perfil.setPeso(Genero.ACAO, 0.0);
         Filme filme = new Filme("F006c", "Blockbuster sem Aderencia", 2024, 120,
                 Set.of(Genero.ACAO), ClassificacaoEtaria.DOZE, Idioma.INGLES, 95);
 
-        // Act
+        
         double score = calculadora.calcular(filme, perfil);
 
-        // Assert
+        
         assertTrue(score <= 30.0);
     }
 
     @Test
     @DisplayName("deve considerar bônus de afinidade baseado em notas históricas")
     void deveConsiderarBonusDeAfinidade() {
-        // Arrange
+        
         perfil.setPeso(Genero.DRAMA, 0.6);
-        perfil.adicionarNota("F_OLD", 5); // nota alta anterior
+        perfil.adicionarNota("F_OLD", 5); 
         
         Filme filmeNovo = new Filme("F007", "Filme Novo Drama", 2020, 120,
                 Set.of(Genero.DRAMA), ClassificacaoEtaria.DOZE, Idioma.INGLES, 70);
 
-        // Act
+        
         double score = calculadora.calcular(filmeNovo, perfil);
 
-        // Assert
-        assertTrue(score >= 40.0); // deve ter score razoável com bônus de afinidade
+        
+        assertTrue(score >= 40.0); 
     }
 
     @Test
     @DisplayName("filme sem gêneros deve ter score baixo")
     void filmeSemGeneroDeveTerScoreBaixo() {
-        // Arrange
-        // Sem gêneros e sem fatores compensatórios para manter o score muito baixo.
+        
+        
         Filme filmeSemGenero = new Filme("F008", "Filme Vazio", 2020, 20,
             Set.of(), ClassificacaoEtaria.DOZE, Idioma.INGLES, 0);
 
-        // Act
+        
         double score = calculadora.calcular(filmeSemGenero, perfil);
 
-        // Assert
-        assertTrue(score < 20.0); // score deve ser muito baixo
+        
+        assertTrue(score < 20.0); 
     }
 
     @Test
     @DisplayName("deve ser determinístico: mesmo filme e perfil retornam mesmo score")
     void deveSerDeterministico() {
-        // Arrange
+        
         perfil.setPeso(Genero.ACAO, 0.7);
         Filme filme = new Filme("F009", "Filme Deterministico", 2020, 120,
             Set.of(Genero.ACAO), ClassificacaoEtaria.DOZE, Idioma.INGLES, 80);
@@ -199,7 +197,7 @@ class CalculadoraScoreTest {
         double score2 = calculadora.calcular(filme, perfil);
         double score3 = calculadora.calcular(filme, perfil);
 
-        // Assert
+        
         assertEquals(score1, score2);
         assertEquals(score2, score3);
     }

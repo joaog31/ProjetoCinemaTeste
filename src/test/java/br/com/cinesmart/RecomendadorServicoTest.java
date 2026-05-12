@@ -45,9 +45,7 @@ import br.com.cinesmart.servico.NotificadorPush;
 import br.com.cinesmart.servico.RecomendadorServico;
 import br.com.cinesmart.utilitario.GeradorAleatorio;
 
-/**
- * Testes unitários para a classe RecomendadorServico (com Mockito).
- */
+
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Teste: RecomendadorServico")
 class RecomendadorServicoTest {
@@ -85,7 +83,7 @@ class RecomendadorServicoTest {
 
     @BeforeEach
     void setUp() {
-        // Criar usuário de teste (Maria do documento)
+        
         PerfilCinefilo perfil = new PerfilCinefilo(90, 150, ClassificacaoEtaria.DEZESSEIS,
                 Set.of(Idioma.PORTUGUES, Idioma.INGLES));
         perfil.setPeso(Genero.FICCAO_CIENTIFICA, 0.9);
@@ -96,7 +94,7 @@ class RecomendadorServicoTest {
 
         usuario = new Usuario("U001", "Maria", 28, perfil, false);
 
-        // Criar catálogo de teste (exemplo do documento)
+        
         catalogoMock = new ArrayList<>();
         catalogoMock.add(new Filme("F01", "Duna: Parte Dois", 2024, 166,
                 Set.of(Genero.FICCAO_CIENTIFICA, Genero.DRAMA),
@@ -126,13 +124,13 @@ class RecomendadorServicoTest {
     @Test
     @DisplayName("deve retornar recomendações ordenadas por score decrescente")
     void deveRetornarRecomendacoesOrdenadas() throws Exception {
-        // Arrange
+        
         when(catalogo.buscarTodos()).thenReturn(catalogoMock);
 
-        // Act
+        
         List<Recomendacao> resultado = servico.recomendar(usuario, 5);
 
-        // Assert
+        
         assertEquals(5, resultado.size());
         assertTrue(resultado.get(0).getScore() >= resultado.get(1).getScore());
         assertTrue(resultado.get(1).getScore() >= resultado.get(2).getScore());
@@ -141,107 +139,107 @@ class RecomendadorServicoTest {
     @Test
     @DisplayName("deve respeitar limite de topN recomendações")
     void deveRespeitarLimiteTopN() throws Exception {
-        // Arrange
+        
         when(catalogo.buscarTodos()).thenReturn(catalogoMock);
 
-        // Act
+        
         List<Recomendacao> resultado = servico.recomendar(usuario, 2);
 
-        // Assert
+        
         assertEquals(2, resultado.size());
     }
 
     @Test
     @DisplayName("deve retornar lista vazia quando catálogo está vazio")
     void deveRetornarListaVaziaQuandoCatalogoVazio() throws Exception {
-        // Arrange
+        
         when(catalogo.buscarTodos()).thenReturn(new ArrayList<>());
 
-        // Act
+        
         List<Recomendacao> resultado = servico.recomendar(usuario, 5);
 
-        // Assert
+        
         assertTrue(resultado.isEmpty());
-        assertNotNull(resultado); // não deve retornar null
+        assertNotNull(resultado); 
     }
 
     @Test
     @DisplayName("deve registrar recomendações no histórico após gerar")
     void deveRegistrarRecomendacoesNoHistorico() throws Exception {
-        // Arrange
+        
         when(catalogo.buscarTodos()).thenReturn(catalogoMock);
 
-        // Act
+        
         servico.recomendar(usuario, 3);
 
-        // Assert
+        
         verify(historico, times(1)).registrarRecomendacao(eq(usuario), anyList());
     }
 
     @Test
     @DisplayName("deve chamar notificador se notificação está habilitada")
     void deveChamarNotificadorQuandoHabilitado() throws Exception {
-        // Arrange
+        
         Usuario usuarioComNotificacao = new Usuario("U002", "João", 30,
-                usuario.getPerfil(), true); // notificação habilitada
+                usuario.getPerfil(), true); 
         when(catalogo.buscarTodos()).thenReturn(catalogoMock);
 
-        // Act
+        
         servico.recomendar(usuarioComNotificacao, 3);
 
-        // Assert
+        
         verify(notificador, times(1)).enviar(eq(usuarioComNotificacao), anyList());
     }
 
     @Test
     @DisplayName("não deve chamar notificador se notificação está desabilitada")
     void naoDeveChamarNotificadorQuandoDesabilitado() throws Exception {
-        // Arrange
+        
         when(catalogo.buscarTodos()).thenReturn(catalogoMock);
 
-        // Act
-        servico.recomendar(usuario, 3); // usuario tem notificação desabilitada
+        
+        servico.recomendar(usuario, 3); 
 
-        // Assert
+        
         verify(notificador, never()).enviar(any(), anyList());
     }
 
     @Test
     @DisplayName("deve retornar lista vazia se API lança exceção")
     void deveRetornarListaVaziaQuandoAPILancaExcecao() throws Exception {
-        // Arrange
+        
         when(catalogo.buscarTodos()).thenThrow(new IOException("API offline"));
 
-        // Act
+        
         List<Recomendacao> resultado = servico.recomendar(usuario, 5);
 
-        // Assert
+        
         assertTrue(resultado.isEmpty());
     }
 
     @Test
     @DisplayName("deve ser resiliente a falha de notificador")
     void deveSerResilienteAFalhaDeNotificador() throws Exception {
-        // Arrange
+        
         Usuario usuarioComNotificacao = new Usuario("U003", "Ana", 25,
                 usuario.getPerfil(), true);
         when(catalogo.buscarTodos()).thenReturn(catalogoMock);
         doThrow(new RuntimeException("Firebase offline")).when(notificador).enviar(any(), anyList());
 
-        // Act & Assert - não deve lançar exceção
+        
         assertDoesNotThrow(() -> servico.recomendar(usuarioComNotificacao, 3));
     }
 
     @Test
     @DisplayName("deve usar ArgumentCaptor para inspecionar recomendações registradas")
     void deveInspecionarRecomendacoesRegistradas() throws Exception {
-        // Arrange
+        
         when(catalogo.buscarTodos()).thenReturn(catalogoMock);
 
-        // Act
+        
         servico.recomendar(usuario, 3);
 
-        // Assert
+        
         verify(historico).registrarRecomendacao(eq(usuario), captorRecomendacoes.capture());
         List<Recomendacao> registradas = captorRecomendacoes.getValue();
         
@@ -254,13 +252,13 @@ class RecomendadorServicoTest {
     @Test
     @DisplayName("recomendação deve conter justificativa textual")
     void recomendacaoDeveTerJustificativa() throws Exception {
-        // Arrange
+        
         when(catalogo.buscarTodos()).thenReturn(catalogoMock);
 
-        // Act
+        
         List<Recomendacao> resultado = servico.recomendar(usuario, 1);
 
-        // Assert
+        
         assertFalse(resultado.isEmpty());
         assertNotNull(resultado.get(0).getJustificativa());
         assertFalse(resultado.get(0).getJustificativa().isEmpty());
@@ -269,15 +267,15 @@ class RecomendadorServicoTest {
     @Test
     @DisplayName("modo aleatório deve retornar um filme do conjunto filtrado")
     void modoAleatorioDevolveFilmeValidoDe() throws Exception {
-        // Arrange
+        
         when(catalogo.buscarTodos()).thenReturn(catalogoMock);
         when(gerador.sortearInteiro(anyInt(), anyInt())).thenReturn(1, 0);
 
-        // Act
+        
         List<Recomendacao> primeiro = servico.recomendarAleatorio(usuario);
         List<Recomendacao> segundo = servico.recomendarAleatorio(usuario);
 
-        // Assert
+        
         assertEquals(1, primeiro.size());
         assertEquals(1, segundo.size());
         assertEquals("F02", primeiro.get(0).getFilme().getId());
@@ -288,26 +286,26 @@ class RecomendadorServicoTest {
     @Test
     @DisplayName("não deve retornar null para coleções")
     void naoDeveRetornarNullParaColecoes() throws Exception {
-        // Arrange
+        
         when(catalogo.buscarTodos()).thenReturn(new ArrayList<>());
 
-        // Act
+        
         List<Recomendacao> resultado = servico.recomendar(usuario, 5);
 
-        // Assert
-        assertNotNull(resultado); // nunca null
+        
+        assertNotNull(resultado); 
     }
 
     @Test
     @DisplayName("deve calcular scores para filmes válidos")
     void deveCalcularScoresParaFilmesValidos() throws Exception {
-        // Arrange
+        
         when(catalogo.buscarTodos()).thenReturn(catalogoMock);
 
-        // Act
+        
         List<Recomendacao> resultado = servico.recomendar(usuario, 5);
 
-        // Assert
+        
         verify(catalogo, atLeastOnce()).buscarTodos();
         assertTrue(calculadora.getChamadas() > 0);
         for (Recomendacao rec : resultado) {
@@ -318,7 +316,7 @@ class RecomendadorServicoTest {
     @Test
     @DisplayName("deve embaralhar apenas filmes empatados por score e popularidade")
     void deveEmbaralharApenasEmpates() throws Exception {
-        // Arrange
+        
         PerfilCinefilo perfilEmpate = new PerfilCinefilo(90, 150, ClassificacaoEtaria.DEZESSEIS,
                 Set.of(Idioma.INGLES));
         perfilEmpate.setPeso(Genero.DRAMA, 1.0);
@@ -334,10 +332,10 @@ class RecomendadorServicoTest {
         when(catalogo.buscarTodos()).thenReturn(catalogoEmpatado);
         when(gerador.sortearInteiro(0, 2)).thenReturn(0);
 
-        // Act
+        
         List<Recomendacao> resultado = servico.recomendar(usuarioEmpate, 2);
 
-        // Assert
+        
         assertEquals(2, resultado.size());
         assertEquals("E02", resultado.get(0).getFilme().getId());
         assertEquals("E01", resultado.get(1).getFilme().getId());
@@ -347,7 +345,7 @@ class RecomendadorServicoTest {
     @Test
     @DisplayName("empates de score devem ser desempatados por popularidade")
     void deveDesempatarPorPopularidadeQuandoScoreEmpata() throws Exception {
-        // Arrange
+        
         CalculadoraScore calculadoraEmpate = new CalculadoraScoreFixa();
         RecomendadorServico servicoLocal = new RecomendadorServico(catalogo, historico, notificador, gerador, calculadoraEmpate, new FiltroFilmes());
 
@@ -360,10 +358,10 @@ class RecomendadorServicoTest {
 
         when(catalogo.buscarTodos()).thenReturn(catalogoEmpatePopularidade);
 
-        // Act
+        
         List<Recomendacao> resultado = servicoLocal.recomendar(usuario, 2);
 
-        // Assert
+        
         assertEquals(2, resultado.size());
         assertEquals("P02", resultado.get(0).getFilme().getId());
         assertEquals("P01", resultado.get(1).getFilme().getId());
