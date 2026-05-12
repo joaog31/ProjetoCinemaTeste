@@ -21,7 +21,6 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import org.mockito.Captor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doThrow;
@@ -29,7 +28,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import br.com.cinesmart.modelo.ClassificacaoEtaria;
@@ -59,10 +57,24 @@ class RecomendadorServicoTest {
     @Mock private NotificadorPush notificador;
     @Mock private GeradorAleatorio gerador;
     @Captor private ArgumentCaptor<List<Recomendacao>> captorRecomendacoes;
-    @Spy private final CalculadoraScore calculadora = new CalculadoraScore();
-    @InjectMocks private RecomendadorServico servico;
+    private final CalculadoraScoreContadora calculadora = new CalculadoraScoreContadora();
+    private RecomendadorServico servico;
     private Usuario usuario;
     private List<Filme> catalogoMock;
+
+    private static class CalculadoraScoreContadora extends CalculadoraScore {
+        private int chamadas;
+
+        @Override
+        public double calcular(Filme filme, PerfilCinefilo perfil) {
+            chamadas++;
+            return super.calcular(filme, perfil);
+        }
+
+        int getChamadas() {
+            return chamadas;
+        }
+    }
 
     private static class CalculadoraScoreFixa extends CalculadoraScore {
         @Override
@@ -107,6 +119,8 @@ class RecomendadorServicoTest {
         catalogoMock.add(new Filme("F07", "A Chegada", 2016, 116,
                 Set.of(Genero.FICCAO_CIENTIFICA, Genero.DRAMA),
                 ClassificacaoEtaria.DOZE, Idioma.INGLES, 84));
+
+        servico = new RecomendadorServico(catalogo, historico, notificador, gerador, calculadora, new FiltroFilmes());
     }
 
     @Test
@@ -295,7 +309,7 @@ class RecomendadorServicoTest {
 
         // Assert
         verify(catalogo, atLeastOnce()).buscarTodos();
-        verify(calculadora, atLeastOnce()).calcular(any(Filme.class), any(PerfilCinefilo.class));
+        assertTrue(calculadora.getChamadas() > 0);
         for (Recomendacao rec : resultado) {
             assertTrue(rec.getScore() >= 0.0 && rec.getScore() <= 100.0);
         }
