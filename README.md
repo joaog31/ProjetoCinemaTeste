@@ -157,7 +157,7 @@ mvn clean package
 | RecomendadorServicoTest | 15 |
 | CatalogoMockTest | 4 |
 | DuracaoInvalidaExecaoTest | 2 |
-! NotaInvalidaExecaoTest | 2 |
+| NotaInvalidaExecaoTest | 2 |
 | PerfilIncompletoExecaoTest| 2 |
 | PesoInvalidoExecaoTest| 2 |
 | RecomendacaoTest | 7 |
