@@ -6,6 +6,14 @@
 
 CineSmart recebe o perfil de um usuário (gêneros preferidos, duração ideal, classificação etária máxima, idiomas, histórico de filmes) e cruza com um catálogo de filmes para gerar uma lista ranqueada das melhores recomendações.
 
+
+## Membros do Grupo
+ Elizandra Maria Silva Barreto dos Santos
+
+ Rodrigo Andrade dos Santos
+
+ João Gabriel da Costa Oliveira
+
 ### Fluxo Principal
 
 ```
@@ -19,8 +27,16 @@ CineSmart recebe o perfil de um usuário (gêneros preferidos, duração ideal, 
    ↓
 5. Retorna top N recomendações + registra histórico + envia notificação
 ```
+## Print do Relatorio do Jacoco
+![Relatorio](image.png)
 
-## Estrutura do Projeto 
+## Diagrama de Classe
+![Diagrama de Classe](<Diagramas/Diagrama de Classe.png>)
+
+## Diagrama de Sequencia
+![Diagrama de Sequencia](<Diagramas/Diagrama de Sequencia.png>)
+
+## Estrutura do Projeto
 
 ```
 CineSmart/
@@ -77,7 +93,6 @@ mvn clean compile
 mvn test
 ```
 
-Saída esperada: **43+ testes passando** (5 + 10 + 8 + 10 + 10)
 
 ### 3. Gerar relatório de cobertura JaCoCo
 
@@ -95,40 +110,6 @@ O relatório será gerado em: `target/site/jacoco/index.html`
 mvn clean package
 ```
 
-## Exemplo de Uso (Pseudocódigo)
-
-```java
-// Criar perfil do usuário
-PerfilCinefilo perfil = new PerfilCinefilo(90, 150, ClassificacaoEtaria.DEZESSEIS,
-    Set.of(Idioma.PORTUGUES, Idioma.INGLES));
-perfil.setPeso(Genero.FICCAO_CIENTIFICA, 0.9);
-perfil.setPeso(Genero.DRAMA, 0.6);
-perfil.setPeso(Genero.TERROR, 0.0);
-
-// Criar usuário
-Usuario usuario = new Usuario("U001", "Maria", 28, perfil);
-
-// Injetar dependências (mocks em teste, reais em produção)
-CatalogoFilmesAPI catalogo = new CatalogoMockRealista(); // ou API real
-HistoricoUsuarioRepositorio historico = mock(...);
-NotificadorPush notificador = mock(...);
-GeradorAleatorio gerador = mock(...);
-CalculadoraScore calculadora = new CalculadoraScore();
-FiltroFilmes filtro = new FiltroFilmes();
-
-// Criar serviço
-RecomendadorServico servico = new RecomendadorServico(
-    catalogo, historico, notificador, gerador, calculadora, filtro
-);
-
-// Gerar recomendações
-List<Recomendacao> top5 = servico.recomendar(usuario, 5);
-
-for (Recomendacao rec : top5) {
-    System.out.println(rec.getFilme().getTitulo() + " - Score: " + rec.getScore());
-    System.out.println(rec.getJustificativa());
-}
-```
 
 ## Componentes Principais
 
