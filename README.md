@@ -146,15 +146,22 @@ mvn clean package
 
 ## Testes Unitários
 
-### Total de Testes: 43+ @Test
+### Total de Testes: 87 @Test
 
-| Classe | Testes | Foco |
-|--------|--------|------|
-| FilmeTest | 5 | Criação, igualdade, imutabilidade |
-| PerfilCinefiloTest | 10 | Validações, histórico, imutabilidade |
-| CalculadoraScoreTest | 8 | Cálculo de score, componentes, determinismo |
-| FiltroFilmesTest | 10 | Cada regra de filtro, casos extremos |
-| RecomendadorServicoTest | 10 | Orquestração, mocks (Mockito), resilência |
+| Classe | Testes |
+|--------|--------|
+| FilmeTest | 6 |
+| PerfilCinefiloTest | 19 |
+| CalculadoraScoreTest | 12 |
+| FiltroFilmesTest | 10 |
+| RecomendadorServicoTest | 15 |
+| CatalogoMockTest | 4 |
+| DuracaoInvalidaExecaoTest | 2 |
+! NotaInvalidaExecaoTest | 2 |
+| PerfilIncompletoExecaoTest| 2 |
+| PesoInvalidoExecaoTest| 2 |
+| RecomendacaoTest | 7 |
+| UsuarioTest | 6 |
 
 ### Anotações JUnit 5 Usadas
 
